@@ -1,0 +1,77 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use IEEE.NUMERIC_STD.ALL;
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity design_project is
+  Port (   clk : in STD_LOGIC;
+           enable_sw : in STD_LOGIC ;
+           BTN : in STD_LOGIC_VECTOR(0 to 3);
+           SEG7 : out STD_LOGIC_VECTOR(7 downto 0); 
+           SSEG_AN : out STD_LOGIC_VECTOR(7 downto 0));
+end design_project;
+
+architecture Behavioral of design_project is
+
+signal state, nextstate: STD_LOGIC_VECTOR(0 to 3):="0000";
+signal clock : STD_LOGIC_VECTOR( 31 downto 0 );
+   
+begin process (clk)
+begin
+ if (clk='1' and clk'event) then
+    if enable_sw='1' then
+      clock <= clock +1;
+     
+      --state <=clock(31 downto 28);
+      --nextstate <=clock(31 downto 28);
+    case state is
+    
+    when "0000" => if (BTN = "0001") then
+    nextstate <= "0001";
+     state <= nextstate;
+    else nextstate <= "0000";
+    state <= nextstate;
+        end if;
+     when "0001" => if (BTN = "0010") then
+     nextstate <= "0010";
+     state <= nextstate;
+     else nextstate <= "0000";
+     --state <= nextstate;
+    end if;
+     when "0010" => if (BTN = "0100") then
+        nextstate <= "0100";
+        state <= nextstate;
+        else nextstate <= "0000";
+        --state <= nextstate;
+       end if;
+        when "0100" => if (BTN = "1000") then
+           nextstate <= "1000";
+           state <= nextstate;
+           else nextstate <= "0000";
+           --state <= nextstate;
+          end if;
+          when "1000" => nextstate <= "1111";
+          when others => nextstate <= "0000";
+          state <= nextstate;
+       end case; 
+  end if;
+   
+   
+      SSEG_AN <= "11111110";
+      if (nextstate = "1111") then
+      SEG7 <= "11000001"; --U
+      else
+      SEG7 <= "11000111"; --L
+        end if;
+    end if;
+ 
+end process; 
+end Behavioral;
